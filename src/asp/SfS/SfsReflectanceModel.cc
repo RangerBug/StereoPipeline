@@ -306,6 +306,71 @@ double ExperimentalLunarLambertianReflectance(Vector3 const& sunPos,
   return reflectance;
 }
 
+double MMPFReflectance(Vector3 const& sunPos,
+                       Vector3 const& viewPos,
+                       Vector3 const& xyz,
+                       Vector3 const& normal,
+                       double phaseCoeffC1,
+                       double phaseCoeffC2,
+                       double & alpha,
+                       const double * refl_coeffs) {
+
+    double reflectance;
+    double LS;
+
+    double len = dot_prod(normal, normal);
+    if (abs(len - 1.0) > 1.0e-4){
+        std::cerr << "Error: Expecting unit normal in the reflectance computation, in "
+                << __FILE__ << " at line " << __LINE__ << std::endl;
+        exit(1);
+    }
+
+    // Compute sun and view direction vectors
+    Vector3 sunDirection = normalize(sunPos - xyz);
+    Vector3 viewDirection = normalize(viewPos - xyz);
+
+    // Compute cosine of incendence (i) and emission (e) angles
+    double cos_i = dot_prod(sunDirection, normal);
+    double cos_e = dot_prod(viewDirection, normal);
+
+    // Compute phase angle (g) in degrees
+    double cos_g = dot_prod(sunDirection, viewDirection);
+    
+    if ((cos_g > 1) || (cos_g < -1)) {
+        printf("cos_g error\n");
+    }
+
+    double g_rad = acos(cos_g);  // phase angle in radians
+    double g = g_rad * 180 / M_PI; // phase angle in degrees
+
+    // Apply Lommel-Seeliger correction
+    if (cos_i + cos_e == 0.0) { // Avoid dividing by zero
+        return 0.0;
+    }
+
+    LS = cos_i / (cos_i + cos_e);
+
+    // Mature Highlands Coeffs
+    double a0 = refl_coeffs[0];
+    double a1 = refl_coeffs[1];
+    double a2 = refl_coeffs[2];
+    double a3 = refl_coeffs[3];
+    double a4 = refl_coeffs[4];
+    double a5 = refl_coeffs[5];
+    double a6 = refl_coeffs[6];
+
+    // Compute reflectance
+    reflectance = LS * exp(a0 
+                         + a1 * g * g
+                         + a2 * g
+                         + a3 * sqrt(g)
+                         + a4 * cos_e
+                         + a5 * cos_i
+                         + a6 * cos_i * cos_i);
+    
+    return reflectance;
+}
+
 // Computes the ground reflectance with a desired reflectance model.
 double calcReflectance(vw::Vector3 const& cameraPosition,
                        vw::Vector3 const& normal, Vector3 const& xyz,
@@ -361,7 +426,15 @@ double calcReflectance(vw::Vector3 const& cameraPosition,
     case LAMBERT:
       input_img_reflectance = LambertianReflectance(sun_position, xyz, normal);
       break;
-
+    case MMPF:
+      input_img_reflectance = MMPFReflectance(sun_position,
+                            cameraPosition,
+                            xyz,  normal,
+                            refl_params.phaseCoeffC1,
+                            refl_params.phaseCoeffC2,
+                            phase_angle, // output
+                            refl_coeffs);
+      break;
     default:
       input_img_reflectance = 1;
     }

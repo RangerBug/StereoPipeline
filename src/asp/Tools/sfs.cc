@@ -1809,7 +1809,7 @@ void handle_arguments(int argc, char *argv[], Options& opt) {
     ("max-iterations,n", po::value(&opt.max_iterations)->default_value(10),
      "Set the maximum number of iterations. Normally 5-10 iterations is enough, even when convergence is not reached, as the solution usually improves quickly at first and only very fine refinements happen later.")
     ("reflectance-type", po::value(&opt.reflectance_type)->default_value(1),
-     "Reflectance type: 0 = Lambertian, 1 = Lunar-Lambert, 2 = Hapke, 3 = Experimental extension of Lunar-Lambert, 4 = Charon model (a variation of Lunar-Lambert).")
+     "Reflectance type: 0 = Lambertian, 1 = Lunar-Lambert, 2 = Hapke, 3 = Experimental extension of Lunar-Lambert, 4 = Charon model (a variation of Lunar-Lambert), 5 = MMPF model (Mean Moon Photometric Function).")
     ("smoothness-weight", po::value(&opt.smoothness_weight)->default_value(0.04),
      "The weight given to the cost function term which consists of sums of squares of second-order derivatives. A larger value will result in a smoother solution with fewer artifacts. See also --gradient-weight.")
     ("initial-dem-constraint-weight", po::value(&opt.initial_dem_constraint_weight)->default_value(0),
@@ -1902,7 +1902,7 @@ void handle_arguments(int argc, char *argv[], Options& opt) {
     ("model-coeffs-prefix", po::value(&opt.model_coeffs_prefix)->default_value(""),
      "Use this prefix to optionally read model coefficients from a file (filename is <prefix>-model_coeffs.txt).")
     ("model-coeffs", po::value(&opt.model_coeffs)->default_value(""),
-     "Use the reflectance model coefficients specified as a list of numbers in quotes. Lunar-Lambertian: O, A, B, C, e.g., '1 -0.019 0.000242 -0.00000146'. Hapke: omega, b, c, B0, h, e.g., '0.68 0.17 0.62 0.52 0.52'. Charon: A, f(alpha), e.g., '0.7 0.63'.")
+     "Use the reflectance model coefficients specified as a list of numbers in quotes. Lunar-Lambertian: O, A, B, C, e.g., '1 -0.019 0.000242 -0.00000146'. Hapke: omega, b, c, B0, h, e.g., '0.68 0.17 0.62 0.52 0.52'. Charon: A, f(alpha), e.g., '0.7 0.63'., MMPF: a0, a1, a2, a3, a4, a5, a6, e.g., '-1.48 -0.00008'.")
     ("num-haze-coeffs", po::value(&opt.num_haze_coeffs)->default_value(0),
      "Set this to 1 to model the problem as image = exposure * albedo * reflectance + "
      "haze, where haze is a single value for each image.")
@@ -2753,6 +2753,8 @@ void setupReflectance(ReflParams & refl_params, Options & opt) {
     refl_params.reflectanceType = ARBITRARY_MODEL;
   else if (opt.reflectance_type == 4)
     refl_params.reflectanceType = CHARON;
+  else if (opt.reflectance_type == 5)
+    refl_params.reflectanceType = MMPF;
   else
     vw_throw( ArgumentErr() << "Expecting Lambertian or Lunar-Lambertian reflectance." );
   refl_params.phaseCoeffC1 = 0; 
@@ -2791,6 +2793,15 @@ void setupReflectance(ReflParams & refl_params, Options & opt) {
       opt.model_coeffs_vec.resize(g_num_model_coeffs);
       opt.model_coeffs_vec[0] = 0.7; // A
       opt.model_coeffs_vec[1] = 0.63; // f(alpha)
+    }else if (refl_params.reflectanceType == MMPF) {
+      // Coefficients for Mature Highlands
+      opt.model_coeffs_vec[0] = -1.480;
+      opt.model_coeffs_vec[1] = -0.00008353;
+      opt.model_coeffs_vec[2] = 0.01296;
+      opt.model_coeffs_vec[3] = -0.2378;
+      opt.model_coeffs_vec[4] = 0.5561;
+      opt.model_coeffs_vec[5] = 0.6637;
+      opt.model_coeffs_vec[6] = -0.4399;
     }else if (refl_params.reflectanceType != LAMBERT) {
       vw_throw( ArgumentErr() << "The Hapke model coefficients were not set. "
                 << "Use the --model-coeffs option." );

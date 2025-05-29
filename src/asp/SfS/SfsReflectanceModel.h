@@ -28,7 +28,7 @@ namespace vw { namespace cartography {
 
 namespace asp {
 
-enum REFL_TYPE {NO_REFL = 0, LAMBERT, LUNAR_LAMBERT, HAPKE, ARBITRARY_MODEL, CHARON};
+enum REFL_TYPE {NO_REFL = 0, LAMBERT, LUNAR_LAMBERT, HAPKE, ARBITRARY_MODEL, CHARON, MMPF};
 
 struct ReflParams {
   int reflectanceType;
