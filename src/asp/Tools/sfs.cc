@@ -2746,7 +2746,6 @@ void setupReflectance(ReflParams & refl_params, Options & opt) {
     refl_params.reflectanceType = CHARON;
   else if (opt.reflectance_type == 5)
     refl_params.reflectanceType = MMPF;
-    std::cout << "Using MMPF\nCaution Still in Testing!\n" << std::endl;
   else
     vw_throw( ArgumentErr() << "Expecting Lambertian or Lunar-Lambertian reflectance." );
   refl_params.phaseCoeffC1 = 0; 
@@ -3011,6 +3010,11 @@ int main(int argc, char* argv[]) {
     // Set up model information
     ReflParams refl_params;
     setupReflectance(refl_params, opt);
+
+    // === Testing ===
+    if (opt.reflectance_type == 5) {
+      std::cout << "Using Reflectance Type: MMPF\nPlease proceed with caution...\n" << std::endl;
+    }
     
     // Manage no-data
     double dem_nodata_val = -std::numeric_limits<float>::max(); // note we use a float nodata
