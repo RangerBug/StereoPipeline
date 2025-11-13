@@ -1806,7 +1806,7 @@ void handle_arguments(int argc, char *argv[], Options& opt) {
     ("max-iterations,n", po::value(&opt.max_iterations)->default_value(10),
      "Set the maximum number of iterations. Normally 5-10 iterations is enough, even when convergence is not reached, as the solution usually improves quickly at first and only very fine refinements happen later.")
     ("reflectance-type", po::value(&opt.reflectance_type)->default_value(1),
-     "Reflectance type: 0 = Lambertian, 1 = Lunar-Lambert, 2 = Hapke, 3 = Experimental extension of Lunar-Lambert, 4 = Charon model (a variation of  1 = Lunar-Lambert, 2 = Hapke, 3 = Experimental extension of Lunar-Lambert, 4 = Charon model (a variation of Lunar-Lambert), 5 = MMPF model (Mean Moon Photometric Function).")
+     "Reflectance type: 0 = Lambertian, 1 = Lunar-Lambert, 2 = Hapke, 3 = Experimental extension of Lunar-Lambert, 4 = Charon model (a variation of Lunar-Lambert), 5 = MMPF model (Mean Moon Photometric Function).")
     ("smoothness-weight", po::value(&opt.smoothness_weight)->default_value(0.04),
      "The weight given to the cost function term which consists of sums of squares of second-order derivatives. A larger value will result in a smoother solution with fewer artifacts. See also --gradient-weight.")
     ("initial-dem-constraint-weight", po::value(&opt.initial_dem_constraint_weight)->default_value(0),
