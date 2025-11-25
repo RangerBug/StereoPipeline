@@ -2786,13 +2786,22 @@ void setupReflectance(ReflParams & refl_params, Options & opt) {
       opt.model_coeffs_vec[1] = 0.63; // f(alpha)
     }else if (refl_params.reflectanceType == MMPF) {
       // Coefficients for Mature Highlands
-      opt.model_coeffs_vec[0] = -1.480;
-      opt.model_coeffs_vec[1] = -0.00008353;
-      opt.model_coeffs_vec[2] = 0.01296;
-      opt.model_coeffs_vec[3] = -0.2378;
-      opt.model_coeffs_vec[4] = 0.5561;
-      opt.model_coeffs_vec[5] = 0.6637;
-      opt.model_coeffs_vec[6] = -0.4399;
+      // opt.model_coeffs_vec[0] = -1.480;
+      // opt.model_coeffs_vec[1] = -0.00008353;
+      // opt.model_coeffs_vec[2] = 0.01296;
+      // opt.model_coeffs_vec[3] = -0.2378;
+      // opt.model_coeffs_vec[4] = 0.5561;
+      // opt.model_coeffs_vec[5] = 0.6637;
+      // opt.model_coeffs_vec[6] = -0.4399;
+      //
+      // Coefficients for high TiO2
+      opt.model_coeffs_vec[0] = -1.8707734833;
+      opt.model_coeffs_vec[1] = -0.0000278818;
+      opt.model_coeffs_vec[2] = 0.0061879702;
+      opt.model_coeffs_vec[3] = -0.2176923120;
+      opt.model_coeffs_vec[4] = 0.1999141144;
+      opt.model_coeffs_vec[5] = 0.6350115749;
+      opt.model_coeffs_vec[6] = -0.4305887432;
     }else if (refl_params.reflectanceType != LAMBERT) {
       vw_throw( ArgumentErr() << "The Hapke model coefficients were not set. "
                 << "Use the --model-coeffs option." );
